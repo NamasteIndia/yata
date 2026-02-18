@@ -44,13 +44,7 @@ INSTALLED_APPS = [
     "whitenoise.runserver_nostatic",
     "django.contrib.staticfiles",
     "player.apps.PlayerConfig",
-    "awards.apps.AwardsConfig",
-    "target.apps.TargetConfig",
-    "faction.apps.FactionConfig",
     "bazaar.apps.BazaarConfig",
-    "stocks.apps.StocksConfig",
-    "company.apps.CompanyConfig",
-    "loot.apps.LootConfig",
     "setup.apps.SetupConfig",
     "api.apps.ApiConfig",
     "django.contrib.admin",
@@ -61,10 +55,7 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "django_extensions",
     "mathfilters",
-    "django_json_widget",
-    "redisboard",
     "corsheaders",
-    # 'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -159,7 +150,32 @@ WSGI_APPLICATION = "yata.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-if config("DATABASE", default="sqlite", cast=str) == "postgresql":
+
+# Support for Koyeb DATABASE_URL environment variable
+database_url = config("DATABASE_URL", default="")
+
+if database_url:
+    # Parse DATABASE_URL (format: postgresql://user:password@host:port/dbname)
+    print(f"[YATA {datestr()}] settings DATABASE=postgresql (from DATABASE_URL)")
+    import re
+    match = re.match(r'postgresql://([^:]+):([^@]+)@([^:]+):(\d+)/(.+)', database_url)
+    if match:
+        user, password, host, port, dbname = match.groups()
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.postgresql_psycopg2",
+                "NAME": dbname,
+                "USER": user,
+                "PASSWORD": password,
+                "HOST": host,
+                "PORT": port,
+                "CONN_MAX_AGE": 600,
+            }
+        }
+    else:
+        print(f"[YATA {datestr()}] ERROR: Could not parse DATABASE_URL")
+        raise ValueError("Invalid DATABASE_URL format")
+elif config("DATABASE", default="sqlite", cast=str) == "postgresql":
     print(f"[YATA {datestr()}] settings DATABASE=postgresql")
     conn_max = config("PG_CONN_MAX_AGE", cast=int, default=600)
     print(f"[YATA {datestr()}] settings CONN_MAX_AGE={conn_max}")

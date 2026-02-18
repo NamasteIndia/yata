@@ -36,12 +36,22 @@ import re
 
 from player.models import *
 from player.functions import updatePlayer
-from faction.models import Faction
 from yata.handy import *
 from yata.bans import user_bans
 
 # yata/views.py
 from django.shortcuts import redirect
+from django.db import connection
+
+def health(request):
+    """Health check endpoint for Koyeb and monitoring"""
+    try:
+        # Check database connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        return JsonResponse({"status": "healthy", "database": "connected"}, status=200)
+    except Exception as e:
+        return JsonResponse({"status": "unhealthy", "error": str(e)}, status=503)
 
 def bot_redirect(request):
     return redirect("https://bot.yata.yt", permanent=True)
