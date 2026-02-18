@@ -21,16 +21,14 @@ from django.utils import timezone
 import json
 
 from yata.handy import *
-from awards.functions import updatePlayerAwards
-from faction.models import Faction
-# from chain.models import Faction
-from awards.models import AwardsData
-# from target.functions import getTargets
-from company.models import CompanyDescription
-from company.models import Company
+
+# Removed imports for simplified bazaar-only version:
+# - awards.functions
+# - faction.models  
+# - company.models
 
 def updatePlayer(player, i=None, n=None):
-    """ update player information
+    """ update player information (simplified for bazaar-only version)
 
     """
 
