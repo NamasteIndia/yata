@@ -1,101 +1,335 @@
-[![Commit activity](https://img.shields.io/github/commit-activity/m/kivou-2000607/yata?color=%23447e9b&logo=github&logoColor=white&style=for-the-badge)](https://github.com/Kivou-2000607/yata/commits)
-[![Last commit](https://img.shields.io/github/last-commit/kivou-2000607/yata?color=%23447e9b&logo=github&logoColor=white&style=for-the-badge)](https://github.com/Kivou-2000607/yata/commits/master)
-[![Discord](https://img.shields.io/discord/581227228537421825?style=for-the-badge&color=%23447e9b&label=Join%20the%20discord&logo=discord&logoColor=FFF)](https://yata.yt/discord)
+# YATA Bazaar - Market Data Tracker
 
-# YATA: Yet Another Torn App
+[![Commit activity](https://img.shields.io/github/commit-activity/m/NamasteIndia/yata?color=%23447e9b&logo=github&logoColor=white&style=for-the-badge)](https://github.com/NamasteIndia/yata/commits)
+[![Last commit](https://img.shields.io/github/last-commit/NamasteIndia/yata?color=%23447e9b&logo=github&logoColor=white&style=for-the-badge)](https://github.com/NamasteIndia/yata/commits/main)
 
-Helper website for the text-based online RPG Torn City https://www.torn.com/
-The website is hosted here: https://yata.yt/
+## Simplified Version - Market/Bazaar Data Only
 
-# Local Setup Instructions
+This is a **simplified version** of YATA (Yet Another Torn App) focused exclusively on **Market/Bazaar data tracking** for [Torn City](https://www.torn.com/).
 
+### Features Included ✅
 
+- **Item Price Tracking**: Monitor current bazaar prices and market values
+- **Price History**: 31-day price history with hourly granularity
+- **Trend Analysis**: 7-day and 31-day price trends using linear regression
+- **Foreign Stocks**: Crowdsourced foreign stock data from third-party tools
+- **Real-Time Updates**: User-initiated bazaar price refreshes
+- **API Endpoints**: External integrations for stock import/export
 
-## Setup guide
-    git clone https://github.com/Kivou-2000607/yata.git
+### Features Removed ❌
 
-    cd yata
+This version has removed:
+- Awards tracking
+- Target management
+- Faction tools
+- Company management
+- Loot timers
+- Stock market tracking
 
-    pip install -U pip
+For the full-featured version, see the [original YATA repository](https://github.com/Kivou-2000607/yata).
 
-    pip install -r requirements.txt
+## Quick Deploy to Koyeb
 
-Create a local .env file
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/)
 
-    ###### REQUIRED ######
-    DEBUG=True
-    SECRET_KEY="xxx"
-    ALLOWED_HOSTS="*"
-    LOG_KEY="xxx"
-    ADMIN_URL_PREFIX="prefix/" # Enter a prefix for your admin URL with a trailing slash.
+See [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md) for detailed deployment instructions.
 
-    # Database selection
-    DATABASE=sqlite
-    #DATABASE=postgresql
-    #PG_NAME=yata
-    #PG_USER=username
-    #PG_PASSWORD=password
-    #PG_HOST=localhost
-    #PG_PORT=5432
-    #PG_CONN_MAX_AGE=600
+## Local Development Setup
 
-    ###### OPTIONAL ######
-    # For most leaving this as default should be fine, but if you have any issues with -4 cache responses you may wish to increase this gradually
-    CACHE_RESPONSE=10
+### Prerequisites
 
-    # The amount of chain report crontabs to run when running crons manually via python ./cron/dev_cron.py
-    CHAIN_REPORT = 1
+- Python 3.8+
+- pip
+- PostgreSQL (optional, SQLite works for development)
 
-    # The amount of attack report crontabs to run when running crons manually via python ./cron/dev_cron.py
-    ATTACK_REPORT = 1
+### Installation
 
-    # The amount of revive report crontabs to run when running crons manually via python ./cron/dev_cron.py
-    REVIVE_REPORT = 1
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/NamasteIndia/yata.git
+   cd yata
+   ```
 
-    # REDIS
-    #USE_REDIS=True
-    #REDIS_HOST="redis://178.62.1.116:6379/1"
-    #REDIS_PASSWORD="xxx"
+2. **Install dependencies**
+   ```bash
+   pip install -U pip
+   pip install -r requirements.txt
+   ```
 
-    # SENTRY
-    # Sentry for error capture
-    ENABLE_SENTRY=False
-    #SENTRY_DSN=YOURDSN
-    #SENTRY_ENVIRONMENT=dev
-    #SENTRY_SAMPLE_RATE=1.0
+3. **Create environment file**
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` and set required variables:
+   ```env
+   DEBUG=True
+   SECRET_KEY=your-secret-key-here
+   ALLOWED_HOSTS=*
+   LOG_KEY=your-log-key
+   DATABASE=sqlite
+   ```
 
-Then run setup.py to initalise everything
+4. **Initialize database**
+   ```bash
+   python manage.py migrate
+   python manage.py createsuperuser
+   ```
 
-    python setup.py
+5. **Collect static files**
+   ```bash
+   python manage.py collectstatic --noinput
+   ```
 
+6. **Run development server**
+   ```bash
+   python manage.py runserver
+   ```
 
+7. **Access the application**
+   - Web interface: http://127.0.0.1:8000/
+   - Admin panel: http://127.0.0.1:8000/admin/
 
-## Running YATA
+### Populate Bazaar Data
 
-To emulate cron activity `./cron/dev_cron.py` can be run as a seperate process. Cron jobs designed to run on a per minute basis will be run as such. Cron's with a longer delay will run on a 30 minute schedule.
+To fetch items from Torn City API:
 
-    python ./cron/dev_cron.py
+```bash
+python manage.py items
+```
 
-See an example of a production crontab
+**Note:** You need a Torn API key. Add it via the Django admin panel at `/admin/setup/apikey/`.
 
-  cat ./cron/crontab.txt
+## Production Deployment
 
-To launch the application simple start the Django Application
+### Environment Variables
 
-    python manage.py runserver
+Required for production:
 
-The admin interface can be accessed via
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `SECRET_KEY` | Django secret key | Random 50-char string |
+| `DEBUG` | Debug mode (False in prod) | `False` |
+| `ALLOWED_HOSTS` | Allowed hostnames | `your-domain.com` |
+| `DATABASE_URL` | PostgreSQL connection | `postgresql://...` |
+| `LOG_KEY` | Logging key | Any string |
 
-    http://127.0.0.1:8000/admin
-    Username: admin
-    Password: adminpass
+Optional:
 
-### Bazaar Default Items
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ENABLE_SENTRY` | Enable Sentry error tracking | `False` |
+| `SENTRY_DSN` | Sentry DSN | - |
+| `CACHE_RESPONSE` | Cache duration (seconds) | `10` |
 
-By default the most commonly traded items are set to appear in https://yata.yt/bazaar/default/. This list can be adjusted.
+### Deploy to Koyeb
 
-    1. Logon To the Admin Section
-    2. Go to the Items table
-    3. Select the item you wish to add
-    4. Enable the flag "OnMarket"
-    5. Save
+See [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md) for step-by-step instructions.
+
+### Deploy to Other Platforms
+
+The application works on any platform that supports:
+- Python 3.8+
+- PostgreSQL
+- WSGI servers (Gunicorn)
+
+The `Procfile` is configured for Heroku-compatible platforms:
+```
+web: gunicorn yata.wsgi --bind 0.0.0.0:$PORT --workers 2 --threads 4
+```
+
+## API Documentation
+
+### Health Check
+
+```bash
+GET /health/
+```
+
+Response:
+```json
+{
+  "status": "healthy",
+  "database": "connected"
+}
+```
+
+### Foreign Stock Import
+
+Submit stock data from foreign countries:
+
+```bash
+POST /api/v1/travel/import/
+Content-Type: application/json
+
+{
+  "country": "jap",
+  "items": [
+    {"id": 197, "quantity": 152, "cost": 25000},
+    {"id": 198, "quantity": 89, "cost": 12000}
+  ],
+  "client": "YourToolName",
+  "version": "1.0.0"
+}
+```
+
+**Countries:** mex, cay, can, haw, uni, arg, swi, jap, chi, uae, sou
+
+### Foreign Stock Export
+
+Retrieve aggregated stock data:
+
+```bash
+GET /api/v1/travel/export/
+```
+
+Response:
+```json
+{
+  "stocks": {
+    "jap": {
+      "update": 1708245600,
+      "stocks": [
+        {
+          "id": 197,
+          "name": "Erotic DVD",
+          "quantity": 152,
+          "cost": 25000
+        }
+      ]
+    }
+  },
+  "timestamp": 1708245723
+}
+```
+
+## Architecture
+
+### Technology Stack
+
+- **Backend**: Django 4.2.25
+- **Database**: PostgreSQL (or SQLite for development)
+- **Server**: Gunicorn
+- **Static Files**: WhiteNoise
+- **Caching**: Django database cache
+- **Analytics**: NumPy, SciPy (linear regression)
+
+### Data Models
+
+- **Item**: Item details, price history, trend analysis
+- **MarketData**: Current bazaar listings (price points)
+- **AbroadStocks**: Foreign country stock data
+- **BazaarData**: Global configuration and statistics
+
+### Price Trend Analysis
+
+The application uses **linear regression** (scipy) to calculate price trends:
+
+- **7-day trend**: Short-term price movement
+- **31-day trend**: Long-term price movement
+
+Trends are stored as:
+- Slope (A): Price change per second
+- Intercept (B): Y-intercept
+- Normalized tendency: Percentage change
+
+## Project Structure
+
+```
+yata/
+├── api/                    # API endpoints
+│   └── views/
+│       ├── main.py        # Root API
+│       └── travel.py      # Foreign stocks
+├── bazaar/                # Bazaar app (main feature)
+│   ├── models.py         # Item, MarketData, AbroadStocks
+│   ├── views.py          # Web interface
+│   ├── urls.py           # URL routing
+│   └── management/
+│       └── commands/
+│           └── items.py  # Item sync command
+├── player/               # Minimal user management
+├── setup/                # Configuration
+├── yata/                 # Django project
+│   ├── settings.py      # Configuration
+│   ├── urls.py          # URL routing
+│   └── views.py         # Health check
+├── templates/           # HTML templates
+├── Procfile            # Koyeb/Heroku deployment
+├── requirements.txt    # Python dependencies
+└── manage.py          # Django management
+```
+
+## Contributing
+
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests (if available)
+5. Submit a pull request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## License
+
+This project is licensed under the GNU General Public License v3.0 - see [LICENSE.md](LICENSE.md) for details.
+
+## Credits
+
+- Original YATA by [Kivou](https://github.com/Kivou-2000607)
+- Simplified for Koyeb deployment
+- [Torn City](https://www.torn.com/) for the game and API
+
+## Support
+
+- **Documentation**: [KOYEB_DEPLOYMENT.md](KOYEB_DEPLOYMENT.md), [BAZAAR_DATA_COLLECTION.md](BAZAAR_DATA_COLLECTION.md)
+- **Discord**: [YATA Discord](https://yata.yt/discord)
+- **Issues**: [GitHub Issues](https://github.com/NamasteIndia/yata/issues)
+
+## Changelog
+
+### v2.0.0 - Simplified Bazaar Version
+- ✅ Removed non-bazaar features (awards, targets, faction, etc.)
+- ✅ Simplified dependencies (removed ML libraries, Redis, etc.)
+- ✅ Added Koyeb deployment support
+- ✅ Added health check endpoint
+- ✅ Improved database configuration (DATABASE_URL support)
+- ✅ Updated documentation
+
+### v1.x - Full Featured Version
+- See [original repository](https://github.com/Kivou-2000607/yata) for history
+
+## Roadmap
+
+Potential future improvements:
+
+- [ ] Automated item sync (scheduled tasks)
+- [ ] Price alerts and notifications
+- [ ] Mobile-responsive UI improvements
+- [ ] GraphQL API
+- [ ] WebSocket support for real-time updates
+- [ ] Advanced filtering and search
+- [ ] Data export features (CSV, JSON)
+
+## FAQ
+
+**Q: Why is this simplified?**  
+A: To make deployment easier and reduce complexity. Focus on core bazaar functionality.
+
+**Q: Can I add back removed features?**  
+A: Yes! Check the original YATA repository and merge the features you need.
+
+**Q: How often does data update?**  
+A: Item metadata updates when you run the `items` command. Bazaar prices update on-demand when users click "Update".
+
+**Q: Is this free to host?**  
+A: Yes! Koyeb offers a free tier that's sufficient for personal use.
+
+**Q: Can I use this commercially?**  
+A: Check the GPL-3.0 license. Generally yes, but you must open-source your modifications.
+
+---
+
+Made with ❤️ for the Torn City community
