@@ -1,8 +1,7 @@
 from django.contrib import admin
 from django.core.cache import cache
 
-from .models import *
-from faction.models import Faction
+from .models import Key, Player, Message
 from yata.handy import timestampToDate
 
 
@@ -63,10 +62,7 @@ class ErrorAdmin(admin.ModelAdmin):
     def date(self, instance):
         return timestampToDate(instance.timestamp)
 
-admin.site.register(Error, ErrorAdmin)
 admin.site.register(Key, KeyAdmin)
 admin.site.register(Player, PlayerAdmin)
 admin.site.register(Message, MessageAdmin)
-# admin.site.register(News, NewsAdmin)
-admin.site.register(Donation, DonationAdmin)
-admin.site.register(PlayerData, PlayerDataAdmin)
+
