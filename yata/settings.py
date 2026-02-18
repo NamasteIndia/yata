@@ -83,22 +83,27 @@ SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 ROOT_URLCONF = "yata.urls"
 
 if DEBUG:
-    INSTALLED_APPS += ["nplusone.ext.django"]
-    MIDDLEWARE = ["nplusone.ext.django.NPlusOneMiddleware", *MIDDLEWARE]
-    NPLUSONE_RAISE = False
-    LOGGING = {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "handlers": {
-            "console": {"class": "logging.StreamHandler"},
-        },
-        "loggers": {
-            "nplusone": {
-                "handlers": ["console"],
-                "level": "WARN",
+    try:
+        import nplusone.ext.django
+        INSTALLED_APPS += ["nplusone.ext.django"]
+        MIDDLEWARE = ["nplusone.ext.django.NPlusOneMiddleware", *MIDDLEWARE]
+        NPLUSONE_RAISE = False
+        LOGGING = {
+            "version": 1,
+            "disable_existing_loggers": False,
+            "handlers": {
+                "console": {"class": "logging.StreamHandler"},
             },
-        },
-    }
+            "loggers": {
+                "nplusone": {
+                    "handlers": ["console"],
+                    "level": "WARN",
+                },
+            },
+        }
+        print(f"[YATA {datestr()}] nplusone loaded for development")
+    except ImportError:
+        print(f"[YATA {datestr()}] nplusone not available (optional)")
 
     TEMPLATES = [
         {
@@ -112,7 +117,6 @@ if DEBUG:
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",
                     "yata.context_processors.sectionMessage",
-                    "yata.context_processors.nextLoot",
                 ],
             },
         },
@@ -129,7 +133,6 @@ else:
                     "django.contrib.auth.context_processors.auth",
                     "django.contrib.messages.context_processors.messages",
                     "yata.context_processors.sectionMessage",
-                    "yata.context_processors.nextLoot",
                 ],
                 "loaders": [
                     (
